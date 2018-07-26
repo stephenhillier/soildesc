@@ -33,6 +33,7 @@ func main() {
 	log.Printf("Starting HTTP server on port 8000.\n")
 	log.Printf("Press CTRL+C to stop.")
 	http.HandleFunc("/projects", s.projectsIndex)
+	http.HandleFunc("/describe", s.Describe)
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
 
