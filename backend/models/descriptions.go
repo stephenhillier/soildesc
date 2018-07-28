@@ -22,5 +22,5 @@ func (db *DB) CreateDescription(r Description) (d Description, err error) {
 		r.Moisture,
 	).StructScan(&d)
 
-	return
+	return d, err
 }

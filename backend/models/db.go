@@ -48,13 +48,14 @@ func (db *DB) migrate() (migrated bool, err error) {
 	row := db.QueryRow(check, 1)
 	err = row.Scan(&migrated)
 
-	if err == nil {
-		return
+	if err == nil && migrated == true {
+		// indicate that the migration does not need to occur
+		return migrated, err
 	}
 
-	createSoilCodes := `CREATE TYPE soil AS ENUM ('sand', 'gravel', 'silt', 'clay', 'cobbles')`
-	createConsCodes := `CREATE TYPE consistency AS ENUM ('loose', 'soft', 'firm', 'compact', 'hard', 'dense')`
-	createMoisCodes := `CREATE TYPE moisture AS ENUM ('very dry', 'dry', 'damp', 'moist', 'wet', 'very wet')`
+	createSoilCodes := `CREATE TYPE soil AS ENUM ('sand', 'gravel', 'silt', 'clay', 'cobbles', '')`
+	createConsCodes := `CREATE TYPE consistency AS ENUM ('loose', 'soft', 'firm', 'compact', 'hard', 'dense', '')`
+	createMoisCodes := `CREATE TYPE moisture AS ENUM ('very dry', 'dry', 'damp', 'moist', 'wet', 'very wet', '')`
 
 	createDescriptionTable := `CREATE TABLE IF NOT EXISTS description(
 		id serial primary key,
@@ -81,11 +82,11 @@ func (db *DB) migrate() (migrated bool, err error) {
 	tx.MustExec(registerMigration)
 	err = tx.Commit()
 	if err != nil {
-		return
+		return migrated, err
 	}
 	log.Println("Database migrated.")
 
 	row = db.QueryRow(check, 1)
 	err = row.Scan(&migrated)
-	return
+	return migrated, err
 }

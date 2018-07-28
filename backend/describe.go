@@ -49,9 +49,15 @@ func parse(orig string) models.Description {
 
 	baseType := make(map[string]string)
 	baseType["gravelly"] = "gravel"
+	baseType["gravels"] = "gravel"
 	baseType["sandy"] = "sand"
+	baseType["sands"] = "sand"
 	baseType["silty"] = "silt"
+	baseType["silts"] = "silt"
 	baseType["clayey"] = "clay"
+	baseType["clays"] = "clay"
+	baseType["water bearing"] = "wet"
+	baseType["water"] = "wet"
 
 	terms := make(map[string][]string)
 
@@ -80,10 +86,11 @@ func parse(orig string) models.Description {
 	terms["consistency"] = []string{"loose", "soft", "firm", "compact", "hard", "dense"}
 
 	// moisture content terms
-	terms["moisture"] = []string{"very dry", "very wet", "dry", "damp", "moist", "wet"}
+	terms["moisture"] = []string{"very dry", "very wet", "water bearing", "water", "dry", "damp", "moist", "wet"}
 
 	var prev string
 	var soil string
+	var moisture string
 
 	for _, word := range singleWords {
 
@@ -91,15 +98,18 @@ func parse(orig string) models.Description {
 	primary:
 		for _, term := range terms["primary"] {
 			// select first matching term and check that it is not part of "some gravel", "trace silt" etc.
-			if word == term && prev != "some" && prev != "trace" && prev != "and" && prev != "&" {
-				d.Primary = word
+			if d.Primary == "" &&
+				(word == term || word == term+"s") &&
+				prev != "some" && prev != "trace" &&
+				prev != "and" && prev != "&" {
+				d.Primary = term
 				break primary
 			}
 
 			// if a second "primary term" exists (e.g. sand and gravel), take the second as the secondary soil type.
-			if word == term && (prev == "and" || prev == "&") {
-				d.Secondary = word
-				break primary // max of two "x and y" terms (e.g. "sand and gravel" but not "sand and gravel and silt")
+			if d.Secondary == "" && (word == term || word == term+"s") {
+				d.Secondary = term
+				break primary
 			}
 		}
 
@@ -108,7 +118,6 @@ func parse(orig string) models.Description {
 			if word == term || prev+" "+word == term {
 				// words like "gravelly" need to be converted
 				soil = baseType[word]
-
 				// if soil is not in baseType map, default to current word
 				if soil == "" {
 					soil = word
@@ -122,20 +131,32 @@ func parse(orig string) models.Description {
 			}
 		}
 
-	consistency:
-		// determine consistency
-		for _, term := range terms["consistency"] {
-			if word == term {
-				d.Consistency = word
-				break consistency
+		if d.Consistency == "" {
+		consistency:
+			// determine consistency
+			for _, term := range terms["consistency"] {
+				if word == term {
+					d.Consistency = word
+					break consistency
+				}
 			}
 		}
 
-	moisture:
-		for _, term := range terms["moisture"] {
-			if word == term || prev+" "+word == term {
-				d.Moisture = term
-				break moisture
+		if d.Moisture == "" {
+		moisture:
+			for _, term := range terms["moisture"] {
+				if word == term || prev+" "+word == term {
+					moisture = baseType[term]
+
+					log.Printf("%s %s", moisture, term)
+					// if soil is not in baseType map, default to current word
+					if moisture == "" {
+						d.Moisture = term
+					} else {
+						d.Moisture = moisture
+					}
+					break moisture
+				}
 			}
 		}
 

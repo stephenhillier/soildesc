@@ -34,7 +34,6 @@ func main() {
 
 	// register middleware
 	s.router.Use(middleware.Logger)
-
 	// register routes from routes.go
 	s.routes()
 
