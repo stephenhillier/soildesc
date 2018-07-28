@@ -5,36 +5,34 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
-)
 
-type formattedDescription struct {
-	Original    string   `json:"original"`
-	Primary     string   `json:"primary"`
-	Secondary   []string `json:"secondary"`
-	Consistency string   `json:"consistency"`
-}
+	"github.com/stephenhillier/soildesc/backend/models"
+)
 
 // Describe takes a soil description string and outputs a more structured response
 func (s *Server) Describe(w http.ResponseWriter, req *http.Request) {
-	defer func(t time.Time) {
-		log.Printf("%s: %s (%v): %s", req.Method, req.URL.Path, time.Since(t), req.FormValue("desc"))
-	}(time.Now())
-
 	desc := req.FormValue("desc")
 
-	response, err := json.Marshal(parse(desc))
+	parsed := parse(desc)
+
+	created, err := s.db.CreateDescription(parsed)
 	if err != nil {
 		http.Error(w, http.StatusText(500), 500)
+		log.Println(err)
 		return
+	}
+
+	response, err := json.Marshal(created)
+	if err != nil {
+		log.Panic(err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(response)
 }
 
-func parse(orig string) formattedDescription {
-	d := formattedDescription{}
+func parse(orig string) models.Description {
+	d := models.Description{}
 	d.Original = orig
 
 	var singleWords []string
@@ -57,45 +55,92 @@ func parse(orig string) formattedDescription {
 
 	terms := make(map[string][]string)
 
+	// parsing a description works by brute force - words in the original description
+	// are matched against the `terms` map.
+	//
+	// standard terminology is relatively limited, but this list could be stored
+	// in a database in the future to allow adding more terms easily
 	terms["primary"] = []string{"gravel", "sand", "clay", "silt"}
-	terms["secondary"] = []string{"sandy", "gravelly", "silty", "clayey"}
+	terms["secondary"] = []string{
+		"sandy",
+		"gravelly",
+		"silty",
+		"clayey",
+		"some sand",
+		"some gravel",
+		"some silt",
+		"some clay",
+		"trace sand",
+		"trace gravel",
+		"trace silt",
+		"trace clay",
+	}
 
-	// consistency terms
+	// consistency terms (firmness/looseness of material)
 	terms["consistency"] = []string{"loose", "soft", "firm", "compact", "hard", "dense"}
 
-	var prev string
+	// moisture content terms
+	terms["moisture"] = []string{"very dry", "very wet", "dry", "damp", "moist", "wet"}
 
-	// determine primary constituent
-primary:
+	var prev string
+	var soil string
+
 	for _, word := range singleWords {
+
+		// determine primary constituent
+	primary:
 		for _, term := range terms["primary"] {
 			// select first matching term and check that it is not part of "some gravel", "trace silt" etc.
-			if word == term && prev != "some" && prev != "trace" {
-				d.Primary = strings.ToUpper(word)
+			if word == term && prev != "some" && prev != "trace" && prev != "and" && prev != "&" {
+				d.Primary = word
 				break primary
 			}
-			prev = word
-		}
-	}
 
-	// determine secondary constituent(s) for -ly terms (gravelly etc.)
-	for _, word := range singleWords {
-		for _, term := range terms["secondary"] {
-			if word == term {
-				d.Secondary = append(d.Secondary, baseType[word])
+			// if a second "primary term" exists (e.g. sand and gravel), take the second as the secondary soil type.
+			if word == term && (prev == "and" || prev == "&") {
+				d.Secondary = word
+				break primary // max of two "x and y" terms (e.g. "sand and gravel" but not "sand and gravel and silt")
 			}
 		}
-	}
 
-consistency:
-	// determine consistency
-	for _, word := range singleWords {
+		// determine secondary constituent(s) for -ly terms (gravelly etc.)
+		for _, term := range terms["secondary"] {
+			if word == term || prev+" "+word == term {
+				// words like "gravelly" need to be converted
+				soil = baseType[word]
+
+				// if soil is not in baseType map, default to current word
+				if soil == "" {
+					soil = word
+				}
+
+				if d.Secondary == "" {
+					d.Secondary = soil
+					// } else {
+					// 	d.Additional = append(d.Additional, soil)
+				}
+			}
+		}
+
+	consistency:
+		// determine consistency
 		for _, term := range terms["consistency"] {
 			if word == term {
 				d.Consistency = word
 				break consistency
 			}
 		}
+
+	moisture:
+		for _, term := range terms["moisture"] {
+			if word == term || prev+" "+word == term {
+				d.Moisture = term
+				break moisture
+			}
+		}
+
+		prev = word
+
 	}
 
 	return d
