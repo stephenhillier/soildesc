@@ -8,7 +8,6 @@ import (
 )
 
 type description struct {
-	ID          uint64 `json:"id" db:"id"`
 	Original    string `json:"original" db:"original"`
 	Primary     string `json:"primary" db:"primary"`
 	Secondary   string `json:"secondary" db:"secondary"`
@@ -19,6 +18,11 @@ type description struct {
 // Describe is an HTTP Handler function that takes an unformatted soil description
 // and returns a JSON response containing a more structured, consistent description format
 func describe(w http.ResponseWriter, req *http.Request) {
+	if req.Method != "POST" {
+		w.Header().Set("accept", "POST")
+		http.Error(w, http.StatusText(405), 405)
+		return
+	}
 	desc := req.FormValue("desc")
 
 	parsed := parseDescription(desc)
