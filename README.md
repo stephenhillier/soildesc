@@ -45,11 +45,6 @@ $GOPATH/src/github.com/<username>/soildesc
 ```
 The soildesc API has no dependencies aside from the standard library.
 
-Change to backend directory:
-```
-cd backend
-```
-
 Running the unit tests:
 ```
 go test
@@ -62,7 +57,7 @@ go build
 
 Running the server:
 ```
-./backend
+./soildesc
 ```
 
 Send a test request:
