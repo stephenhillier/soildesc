@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type description struct {
@@ -18,6 +19,10 @@ type description struct {
 // Describe is an HTTP Handler function that takes an unformatted soil description
 // and returns a JSON response containing a more structured, consistent description format
 func describe(w http.ResponseWriter, req *http.Request) {
+	defer func(t time.Time) {
+		log.Printf("%s: %s (%v): %s", req.Method, req.URL.Path, time.Since(t), req.FormValue("desc"))
+	}(time.Now())
+
 	if req.Method != "POST" {
 		w.Header().Set("accept", "POST")
 		http.Error(w, http.StatusText(405), 405)
