@@ -4,12 +4,12 @@ pipeline {
       image 'golang:1.10-alpine'
     }
   }
-}
 
-stages {
-  stage('Build') {
-    steps {
-      sh 'go version'
+  stages {
+    stage('Build') {
+      steps {
+        sh 'go version'
+      }
     }
   }
 }
