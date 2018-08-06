@@ -20,7 +20,7 @@ type description struct {
 // and returns a JSON response containing a more structured, consistent description format
 func describe(w http.ResponseWriter, req *http.Request) {
 	defer func(t time.Time) {
-		log.Printf("%s: %s (%v): %s", req.Method, req.URL.Path, time.Since(t), req.FormValue("desc"))
+		log.Printf("[soildesc] %s: %s (%v): %s", req.Method, req.URL.Path, time.Since(t), req.FormValue("desc"))
 	}(time.Now())
 
 	if req.Method != "POST" {
