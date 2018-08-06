@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/http"
 )
 
@@ -12,6 +11,5 @@ func health(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log.Println("[soildesc] Health check")
 	w.WriteHeader(http.StatusOK)
 }
