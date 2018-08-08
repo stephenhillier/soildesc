@@ -68,17 +68,18 @@ func parseDescription(orig string) description {
 	// some sand, some silt, some clay, trace sand, trace gravel,
 	// trace clay, trace silt
 
-	baseType := make(map[string]string)
-	baseType["gravelly"] = "gravel"
-	baseType["gravels"] = "gravel"
-	baseType["sandy"] = "sand"
-	baseType["sands"] = "sand"
-	baseType["silty"] = "silt"
-	baseType["silts"] = "silt"
-	baseType["clayey"] = "clay"
-	baseType["clays"] = "clay"
-	baseType["water bearing"] = "wet"
-	baseType["water"] = "wet"
+	baseType := map[string]string{
+		"gravelly":      "gravel",
+		"gravels":       "gravel",
+		"sandy":         "sand",
+		"sands":         "sand",
+		"silty":         "silt",
+		"silts":         "silt",
+		"clayey":        "clay",
+		"clays":         "clay",
+		"water bearing": "wet",
+		"water":         "wet",
+	}
 
 	terms := make(map[string][]string)
 
