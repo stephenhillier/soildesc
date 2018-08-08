@@ -24,7 +24,7 @@ func describe(w http.ResponseWriter, req *http.Request) {
 	}(time.Now())
 
 	if req.Method != "POST" {
-		w.Header().Set("accept", "POST")
+		w.Header().Set("Allow", "POST")
 		http.Error(w, http.StatusText(405), 405)
 		return
 	}

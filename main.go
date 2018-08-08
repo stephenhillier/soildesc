@@ -16,7 +16,7 @@ func main() {
 
 func health(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "GET" {
-		w.Header().Set("accept", "GET")
+		w.Header().Set("Allow", "POST")
 		http.Error(w, http.StatusText(405), 405)
 		return
 	}
