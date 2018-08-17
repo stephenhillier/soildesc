@@ -25,7 +25,7 @@ func describe(w http.ResponseWriter, req *http.Request) {
 
 	if req.Method != "POST" {
 		w.Header().Set("Allow", "POST")
-		http.Error(w, "Nope! Not today!", 405)
+		http.Error(w, "Method not allowed. Try another method!", 405)
 		return
 	}
 	desc := req.FormValue("desc")
