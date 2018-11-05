@@ -1,21 +1,18 @@
 # soildesc
-Generate database-friendly soil descriptions from a field or lab visual description
+Parse terms from a visual description of a soil sample
 
 
 ## Visual descriptions
 Visual descriptions help engineering technologists and field engineers log soil conditions at a drilling site. A relatively plain-english, descriptive format is used :
 > sand, some gravel, wet
 
-Using well-known terms (soil types like "sand", "gravel", "silt", and adjectives like "wet", "compact", "jagged") allows field descriptions
-to be easily understood by other engineers who can get a basic, general understanding of the lithology of a project site. 
-
-Even though visual descriptions work well for humans, they are not always database friendly. `soildesc` aims to parse field descriptions
-into a JSON-formatted object containing consistent terminology:
+Soildesc parses these descriptions and returns data in a format that is easier to use with a database or programming language:
 
 ```
 > sand, silty, wet
 
 {
+    "ordered": ["sand", "silt"],
     "primary": "sand",
     "secondary": "silt",
     "moisture": "wet"
@@ -26,6 +23,7 @@ into a JSON-formatted object containing consistent terminology:
 > loose water bearing silts, sands
 
 {
+    "ordered": ["silt", "sand"],
     "primary": "silt",
     "secondary": "sand",
     "consistency": "loose",
@@ -35,14 +33,7 @@ into a JSON-formatted object containing consistent terminology:
 ## Methodology
 The text string is simply scanned, comparing each word (as well as the one before it) with some pre-defined lists of common terms.
 
-## Starting the API
-The API is written in Go; building the server requires having the [Go language](http://www.golang.org/) installed.
-It is recommended that you follow the instructions for setting up a Go environment and clone
-the repository into your `src` dir:
-```
-$GOPATH/src/github.com/<username>/soildesc
-```
-The soildesc API has no dependencies aside from the standard library.
+## Usage
 
 Running the unit tests:
 ```
