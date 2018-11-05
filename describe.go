@@ -9,11 +9,12 @@ import (
 )
 
 type description struct {
-	Original    string `json:"original" db:"original"`
-	Primary     string `json:"primary" db:"primary"`
-	Secondary   string `json:"secondary" db:"secondary"`
-	Consistency string `json:"consistency" db:"consistency"`
-	Moisture    string `json:"moisture" db:"moisture"`
+	Original    string   `json:"original" db:"original"`
+	Ordered     []string `json:"ordered" db:"ordered"`
+	Primary     string   `json:"primary" db:"primary"`
+	Secondary   string   `json:"secondary" db:"secondary"`
+	Consistency string   `json:"consistency" db:"consistency"`
+	Moisture    string   `json:"moisture" db:"moisture"`
 }
 
 // Describe is an HTTP Handler function that takes an unformatted soil description
@@ -126,10 +127,12 @@ func parseDescription(orig string) description {
 			if (word == term || word == term+"s") && prev != "some" && prev != "trace" {
 				if d.Primary == "" && prev != "and" && prev != "&" {
 					d.Primary = term
+					d.Ordered = append([]string{term}, d.Ordered...)
 				} else if d.Secondary == "" {
 					// some secondary soil types might come in the form "sand and gravel" (e.g. gravel will be secondary)
 					// we can catch these while searching for primary terms
 					d.Secondary = term
+					d.Ordered = append(d.Ordered, term)
 					break primary
 				}
 			}
@@ -152,8 +155,9 @@ func parseDescription(orig string) description {
 
 				if d.Secondary == "" {
 					d.Secondary = soil
-					// } else {
-					// 	d.Additional = append(d.Additional, soil)
+					d.Ordered = append(d.Ordered, soil)
+				} else {
+					d.Ordered = append(d.Ordered, soil)
 				}
 			}
 		}
@@ -191,5 +195,9 @@ func parseDescription(orig string) description {
 	}
 
 	return d
+
+}
+
+func reorderTerms(orig string) {
 
 }

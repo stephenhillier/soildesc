@@ -33,8 +33,7 @@ into a JSON-formatted object containing consistent terminology:
 }
 ```
 ## Methodology
-`soildesc` does not take an elegant approach. The text string is simply scanned, comparing each word
-(as well as the one before it) with some pre-defined lists of common terms.
+The text string is simply scanned, comparing each word (as well as the one before it) with some pre-defined lists of common terms.
 
 ## Starting the API
 The API is written in Go; building the server requires having the [Go language](http://www.golang.org/) installed.

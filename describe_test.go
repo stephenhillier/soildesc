@@ -9,10 +9,13 @@ func TestParseDescription(t *testing.T) {
 		desc string
 		want description
 	}{
-		{"wet gravel", description{Primary: "gravel", Moisture: "wet"}},
-		{"compact silty sand, some clay, wet", description{Primary: "sand", Secondary: "silt", Consistency: "compact", Moisture: "wet"}},
-		{"water bearing sands, trace gravel, loose", description{Primary: "sand", Secondary: "gravel", Consistency: "loose", Moisture: "wet"}},
-		{"silty sand and gravel", description{Primary: "sand", Secondary: "gravel"}},
+		{"wet gravel", description{Primary: "gravel", Moisture: "wet", Ordered: []string{"gravel"}}},
+		{"compact silty sand, some clay, wet", description{Primary: "sand", Secondary: "silt", Consistency: "compact", Moisture: "wet", Ordered: []string{"sand", "silt", "clay"}}},
+		{"water bearing sands, trace gravel, loose", description{Primary: "sand", Secondary: "gravel", Consistency: "loose", Moisture: "wet", Ordered: []string{"sand", "gravel"}}},
+
+		// note: this is a poor description.  silty should come last.  here we just make sure it is handled as if silty came after gravel
+		{"silty sand and gravel", description{Primary: "sand", Secondary: "gravel", Ordered: []string{"sand", "gravel", "silt"}}},
+		{"sand and gravel, silty", description{Primary: "sand", Secondary: "gravel", Ordered: []string{"sand", "gravel", "silt"}}},
 	}
 
 	for _, test := range cases {
@@ -29,5 +32,27 @@ func TestParseDescription(t *testing.T) {
 		if desc.Moisture != test.want.Moisture {
 			t.Errorf("Moisture was incorrect. got: %s, want: %s", desc.Moisture, test.want.Moisture)
 		}
+		if !testEq(desc.Ordered, test.want.Ordered) {
+			t.Errorf("Ordered terms were incorrect. got: %s, want: %s", desc.Ordered, test.want.Ordered)
+
+		}
 	}
+}
+
+func testEq(a, b []string) bool {
+	if (a == nil) != (b == nil) {
+		return false
+	}
+
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
 }
