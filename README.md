@@ -1,5 +1,5 @@
 # soildesc
-Parse terms from a visual description of a soil sample
+Soil description parsing
 
 
 ## Visual descriptions
