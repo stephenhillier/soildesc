@@ -31,7 +31,8 @@ Soildesc parses these descriptions and returns data in a format that is easier t
 }
 ```
 ## Methodology
-The text string is simply scanned, comparing each word (as well as the one before it) with some pre-defined lists of common terms.
+The text string is scanned, looking for key terms. Note: Field descriptions are generally written with the most significant soil type first, unless a qualified term is used (e.g. in "silty sand", sand is the most significant term). Soildesc handles these cases by
+looking for the first "non qualified" term and putting the "-ey" term second.
 
 ## Usage
 
