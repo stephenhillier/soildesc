@@ -31,6 +31,8 @@ func ParseDescription(orig string) (Description, error) {
 
 	var singleWords []string
 
+	orig = strings.ToLower(orig)
+
 	for _, word := range strings.Split(orig, " ") {
 		singleWords = append(singleWords, strings.Trim(word, ","))
 	}
