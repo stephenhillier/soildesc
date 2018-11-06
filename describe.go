@@ -1,14 +1,11 @@
-package main
+package soildesc
 
 import (
-	"encoding/json"
-	"log"
-	"net/http"
 	"strings"
-	"time"
 )
 
-type description struct {
+// Description contains information about a parsed soil visual description
+type Description struct {
 	Original    string   `json:"original" db:"original"`
 	Ordered     []string `json:"ordered" db:"ordered"`
 	Primary     string   `json:"primary" db:"primary"`
@@ -17,32 +14,7 @@ type description struct {
 	Moisture    string   `json:"moisture" db:"moisture"`
 }
 
-// Describe is an HTTP Handler function that takes an unformatted soil description
-// and returns a JSON response containing a more structured, consistent description format
-func describe(w http.ResponseWriter, req *http.Request) {
-	defer func(t time.Time) {
-		log.Printf("[soildesc] %s: %s (%v): %s", req.Method, req.URL.Path, time.Since(t), req.FormValue("desc"))
-	}(time.Now())
-
-	if req.Method != "POST" {
-		w.Header().Set("Allow", "POST")
-		http.Error(w, "Method not allowed. Try another method!", 405)
-		return
-	}
-	desc := req.FormValue("desc")
-
-	parsed := parseDescription(desc)
-
-	response, err := json.Marshal(parsed)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(response)
-}
-
-// parseDescription takes an input string, scans it for keywords and fills
+// ParseDescription takes an input string, scans it for keywords and fills
 // a description struct type with a best guess for each category
 // (primary, secondary soil etc)
 //
@@ -53,8 +25,8 @@ func describe(w http.ResponseWriter, req *http.Request) {
 // TODO: this code started small, checking input against some limited cases
 // Adding more cases and categories (e.g. moisture, consistency) has increased
 // need for refactor.
-func parseDescription(orig string) description {
-	d := description{}
+func ParseDescription(orig string) (Description, error) {
+	d := Description{}
 	d.Original = orig
 
 	var singleWords []string
@@ -194,10 +166,5 @@ func parseDescription(orig string) description {
 
 	}
 
-	return d
-
-}
-
-func reorderTerms(orig string) {
-
+	return d, nil
 }

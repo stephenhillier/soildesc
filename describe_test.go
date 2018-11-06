@@ -1,4 +1,4 @@
-package main
+package soildesc
 
 import (
 	"testing"
@@ -7,19 +7,22 @@ import (
 func TestParseDescription(t *testing.T) {
 	cases := []struct {
 		desc string
-		want description
+		want Description
 	}{
-		{"wet gravel", description{Primary: "gravel", Moisture: "wet", Ordered: []string{"gravel"}}},
-		{"compact silty sand, some clay, wet", description{Primary: "sand", Secondary: "silt", Consistency: "compact", Moisture: "wet", Ordered: []string{"sand", "silt", "clay"}}},
-		{"water bearing sands, trace gravel, loose", description{Primary: "sand", Secondary: "gravel", Consistency: "loose", Moisture: "wet", Ordered: []string{"sand", "gravel"}}},
+		{"wet gravel", Description{Primary: "gravel", Moisture: "wet", Ordered: []string{"gravel"}}},
+		{"compact silty sand, some clay, wet", Description{Primary: "sand", Secondary: "silt", Consistency: "compact", Moisture: "wet", Ordered: []string{"sand", "silt", "clay"}}},
+		{"water bearing sands, trace gravel, loose", Description{Primary: "sand", Secondary: "gravel", Consistency: "loose", Moisture: "wet", Ordered: []string{"sand", "gravel"}}},
 
-		// note: this is a poor description.  silty should come last.  here we just make sure it is handled as if silty came after gravel
-		{"silty sand and gravel", description{Primary: "sand", Secondary: "gravel", Ordered: []string{"sand", "gravel", "silt"}}},
-		{"sand and gravel, silty", description{Primary: "sand", Secondary: "gravel", Ordered: []string{"sand", "gravel", "silt"}}},
+		// note: this is a poor sescription.  silty should come last.  here we just make sure it is handled as if silty came after gravel
+		{"silty sand and gravel", Description{Primary: "sand", Secondary: "gravel", Ordered: []string{"sand", "gravel", "silt"}}},
+		{"sand and gravel, silty", Description{Primary: "sand", Secondary: "gravel", Ordered: []string{"sand", "gravel", "silt"}}},
 	}
 
 	for _, test := range cases {
-		desc := parseDescription(test.desc)
+		desc, err := ParseDescription(test.desc)
+		if err != nil {
+			t.Errorf("Error running ParseDescription function")
+		}
 		if desc.Primary != test.want.Primary {
 			t.Errorf("Primary soil was incorrect. got: %s, want: %s", desc.Primary, test.want.Primary)
 		}
