@@ -64,7 +64,7 @@ func ParseDescription(orig string) (Description, error) {
 	// standard terminology is relatively limited, but this list could be stored
 	// in a database in the future to allow adding more terms easily
 
-	terms["primary"] = []string{"gravel", "sand", "clay", "silt"}
+	terms["primary"] = []string{"gravel", "sand", "clay", "silt", "bedrock", "granite", "granodiorite", "basalt", "sandstone", "shale", "boulders", "cobbles", "gravels", "mud", "till"}
 	terms["secondary"] = []string{
 		"sandy",
 		"gravelly",
