@@ -33,6 +33,21 @@ func ParseDescription(orig string) (Description, error) {
 
 	orig = strings.ToLower(orig)
 
+	r := strings.NewReplacer(
+		",", " ",
+		"-", " ",
+		":", " ",
+		"\\", " ",
+		"/", " ",
+		";", " ",
+		".", " ",
+		"?", " ",
+		"(", " ",
+		")", " ",
+	)
+
+	orig = r.Replace(orig)
+
 	for _, word := range strings.Split(orig, " ") {
 		singleWords = append(singleWords, strings.Trim(word, ","))
 	}
@@ -64,7 +79,38 @@ func ParseDescription(orig string) (Description, error) {
 	// standard terminology is relatively limited, but this list could be stored
 	// in a database in the future to allow adding more terms easily
 
-	terms["primary"] = []string{"gravel", "sand", "clay", "silt", "bedrock", "granite", "granodiorite", "basalt", "sandstone", "shale", "boulders", "cobbles", "gravels", "mud", "till"}
+	terms["primary"] = []string{
+		"gravel",
+		"sand",
+		"clay",
+		"silt",
+		"hardpan",
+		"soil",
+		"bedrock",
+		"muskeg",
+		"topsoil",
+		"mudstone",
+		"granite",
+		"conglomerate",
+		"granodiorite",
+		"basalt",
+		"sandstone",
+		"shale",
+		"boulders",
+		"cobbles",
+		"gravels",
+		"mud",
+		"till",
+		"rock",
+		"gneiss",
+		"quartz",
+		"quartzite",
+		"limestone",
+		"pebbles",
+		"organics",
+		"volcanics",
+		"feldspar"}
+
 	terms["secondary"] = []string{
 		"sandy",
 		"gravelly",
