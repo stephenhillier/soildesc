@@ -69,7 +69,7 @@ func TestParseSoilTermsV2(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		desc := ParseSoilTerms(splitWords(test.desc))
+		desc := ParseSoilTerms(test.desc)
 
 		if !testEq(desc, test.want) {
 			t.Errorf("Ordered terms were incorrect. got: %s, want: %s", desc, test.want)

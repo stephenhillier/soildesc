@@ -247,7 +247,11 @@ func splitWords(orig string) []string {
 	return singleWords
 }
 
-func ParseSoilTerms(words []string) []string {
+// ParseSoilTerms parses a soil description and returns key soil terms in order of importance
+func ParseSoilTerms(description string) []string {
+
+	words := splitWords(description)
+
 	// capitalization may be significant...but some data may arrive completely capitalized
 	// if every letter is capitalized, we will turn off ranking by capitilization
 	inputIsAllCaps := true
