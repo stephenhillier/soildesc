@@ -2,7 +2,6 @@ package soildesc
 
 import (
 	"errors"
-	"log"
 	"regexp"
 	"strings"
 )
@@ -243,7 +242,6 @@ func splitWords(orig string) []string {
 	for _, word := range strings.Split(orig, " ") {
 		singleWords = append(singleWords, word)
 	}
-	log.Println(singleWords)
 	return singleWords
 }
 
