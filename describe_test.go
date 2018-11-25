@@ -16,6 +16,12 @@ func TestParseDescription(t *testing.T) {
 		// note: this is a poor sescription.  silty should come last.  here we just make sure it is handled as if silty came after gravel
 		{"silty sand and gravel", Description{Primary: "sand", Secondary: "gravel", Ordered: []string{"sand", "gravel", "silt"}}},
 		{"sand and gravel, silty", Description{Primary: "sand", Secondary: "gravel", Ordered: []string{"sand", "gravel", "silt"}}},
+
+		// from "Applications of Artifial Intelligence in Engineering VI" by G. Rzevzky, R.A. Adey 2012
+		// {
+		// 	"Moist stiff reddish brown closely fissured thinly bedded silty sand CLAY with a little dark greenish grey sub-rounded fine gravel",
+		// 	Description{Primary: "clay", Secondary: "sand", Ordered: []string{"clay", "sand", "silt", "gravel"}},
+		// },
 	}
 
 	for _, test := range cases {
@@ -38,6 +44,35 @@ func TestParseDescription(t *testing.T) {
 		if !testEq(desc.Ordered, test.want.Ordered) {
 			t.Errorf("Ordered terms were incorrect. got: %s, want: %s", desc.Ordered, test.want.Ordered)
 
+		}
+	}
+}
+
+func TestParseSoilTermsV2(t *testing.T) {
+	cases := []struct {
+		desc string
+		want []string
+	}{
+		{"wet gravel", []string{"gravel"}},
+		{"compact silty sand, some clay, wet", []string{"sand", "silt", "clay"}},
+		{"water bearing sands, trace gravel, loose", []string{"sand", "gravel"}},
+
+		// note: this is a poor sescription.  silty should come last.  here we just make sure it is handled as if silty came after gravel
+		{"silty sand and gravel", []string{"sand", "gravel", "silt"}},
+		{"SAND and GRAVEL, silty", []string{"sand", "gravel", "silt"}},
+
+		// from "Applications of Artificial Intelligence in Engineering VI" by G. Rzevzky, R.A. Adey 2012
+		// {
+		// 	"Moist stiff reddish brown closely fissured thinly bedded silty sand CLAY with a little dark greenish grey sub-rounded fine gravel",
+		// 	[]string{"clay", "sand", "silt", "gravel"},
+		// },
+	}
+
+	for _, test := range cases {
+		desc := ParseSoilTerms(splitWords(test.desc))
+
+		if !testEq(desc, test.want) {
+			t.Errorf("Ordered terms were incorrect. got: %s, want: %s", desc, test.want)
 		}
 	}
 }
